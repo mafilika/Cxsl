@@ -1,0 +1,36 @@
+{
+  "indexes": [
+    { "collectionGroup": "contractors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "published", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "tierRank", "order": "ASCENDING" },
+      { "fieldPath": "points", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "contractors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "published", "order": "ASCENDING" },
+      { "fieldPath": "province", "order": "ASCENDING" },
+      { "fieldPath": "categoryId", "order": "ASCENDING" },
+      { "fieldPath": "tierRank", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "contractors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "published", "order": "ASCENDING" },
+      { "fieldPath": "city", "order": "ASCENDING" },
+      { "fieldPath": "tierRank", "order": "ASCENDING" }
+    ]},
+    { "collectionGroup": "contractors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "published", "order": "ASCENDING" },
+      { "fieldPath": "joinedAt", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "contractors", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "published", "order": "ASCENDING" },
+      { "fieldPath": "tierRank", "order": "ASCENDING" },
+      { "fieldPath": "points", "order": "DESCENDING" }
+    ]},
+    { "collectionGroup": "reviews", "queryScope": "COLLECTION", "fields": [
+      { "fieldPath": "contractorId", "order": "ASCENDING" },
+      { "fieldPath": "status", "order": "ASCENDING" },
+      { "fieldPath": "createdAt", "order": "DESCENDING" }
+    ]}
+  ],
+  "fieldOverrides": []
+}

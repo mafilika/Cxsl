@@ -1,0 +1,28 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    function isAdmin() { return isSignedIn() && request.auth.token.role == 'admin'; }
+    function isImage() { return request.resource.contentType.matches('image/.*'); }
+    function isUnder5MB() { return request.resource.size < 5 * 1024 * 1024; }
+
+    // Contractor logos, covers, gallery, and post images — publicly readable
+    // (shown on public profiles), writable only by the admin since
+    // contractors don't have their own accounts in this manual-listing setup.
+    match /contractors/{contractorId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() && isImage() && isUnder5MB();
+    }
+
+    // Review photos uploaded by customers
+    match /reviews/{reviewId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isSignedIn() && isImage() && isUnder5MB();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
