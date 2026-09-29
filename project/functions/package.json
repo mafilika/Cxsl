@@ -1,8 +1,0 @@
-{
-  "name": "csp-functions",
-  "description": "Central Service Point — admin role claims + contractor profile SEO SSR",
-  "engines": { "node": "20" },
-  "main": "index.js",
-  "dependencies": { "firebase-admin": "^12.3.1", "firebase-functions": "^5.0.1" },
-  "private": true
-}
