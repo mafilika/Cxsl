@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+    // Replace with the UID of the admin user (Authentication > Users)
+    function isAdmin() { return request.auth != null && request.auth.uid in ['Ar9ZNBOMpigdqOyPTGSWUu0KYhl2']; }
+
+    match /contractors/{id} {
+      allow read: if isAdmin() || (resource.data.approved == true && resource.data.published == true);
+      allow create: if isAdmin() || (request.resource.data.id == id
+        && request.resource.data.approved == false
+        && request.resource.data.published == false
+        && request.resource.data.featured == false
+        && request.resource.data.name is string && request.resource.data.name.size() < 200
+        && request.resource.data.desc.size() < 3000);
+      allow update, delete: if isAdmin();
+    }
+    match /quotationRequests/{id} {
+      allow create: if request.resource.data.status == 'New'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.name is string && request.resource.data.name.size() < 200
+        && request.resource.data.email.size() < 200
+        && request.resource.data.desc.size() < 3000
+        && request.resource.data.contractorId is string;
+      allow read, update, delete: if isAdmin();
+    }
+    match /messages/{id} {
+      allow create: if request.resource.data.createdAt == request.time
+        && request.resource.data.message.size() < 3000
+        && request.resource.data.email.size() < 200;
+      allow read, update, delete: if isAdmin();
+    }
+    match /posts/{id} {
+      allow read: if isAdmin() || resource.data.published == true;
+      allow write: if isAdmin();
+    }
+    match /members/{uid} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.plan == 'free'
+        && request.resource.data.status == 'Pending'
+        && request.resource.data.contractorId == '';
+      allow update, delete: if isAdmin();
+    }
+    match /inbox/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.toUid == request.auth.uid);
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (request.auth != null && resource.data.toUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']));
+    }
+    match /serviceRequests/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.status == 'New'
+        && request.resource.data.notes.size() < 2000;
+      allow update, delete: if isAdmin();
+    }
+    match /documents/{id} {
+      allow read: if isAdmin() || (request.auth != null && resource.data.uid == request.auth.uid);
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid
+        && request.resource.data.type in ['quotation', 'invoice']
+        && get(/databases/$(db)/documents/members/$(request.auth.uid)).data.plan == 'elite';
+      allow update, delete: if isAdmin();
+    }
+    match /listings/{uid} {
+      allow read: if isAdmin() || (request.auth != null && request.auth.uid == uid);
+      allow create, update: if isAdmin() || (request.auth != null && request.auth.uid == uid
+        && request.resource.data.uid == uid
+        && request.resource.data.status == 'Submitted'
+        && request.resource.data.businessName.size() < 200
+        && request.resource.data.desc.size() < 3000
+        && exists(/databases/$(db)/documents/members/$(request.auth.uid)));
+      allow delete: if isAdmin();
+    }
+    match /media/{id} {
+      allow read: if isAdmin() || get(/databases/$(db)/documents/contractors/$(id)).data.published == true;
+      allow write: if isAdmin();
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}
